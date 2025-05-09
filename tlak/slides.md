@@ -6,6 +6,15 @@ hideInToc: true
 
 # Thinking like a Kubernetes
 
+<div class="abs-br m-6 text-xl">
+  <a href="https://github.com/ndrpnt/slides" target="_blank" class="slidev-icon-btn">
+    <carbon-logo-github />
+  </a>
+  <a href="https://www.linkedin.com/in/ndrpnt" target="_blank" class="slidev-icon-btn">
+    <carbon-logo-linkedin />
+  </a>
+</div>
+
 ---
 hideInToc: true
 
@@ -16,15 +25,17 @@ hideInToc: true
 * Demystify Kubernetes and containers
 * Build foundational mental models
 
-<svg width="400" viewBox="0 0 640 360" class="absolute right-100px bottom-50px">
+<svg width="500" viewBox="0 0 640 360" v-click class="absolute right-100px bottom-35px">
+  <rect height="300" width="100" x="60" y="0" fill="LightCoral" opacity="0.5"/>
   <path d="M 60 300 Q 200 300, 350 150, 500 2, 640 2"
-        stroke="black" stroke-width="4" fill="none" />
-  <rect fill="#F00" opacity="0.25" height="300" width="100" x="60" y="0"/>
-  <text x="350" y="350" text-anchor="middle" font-size="12">Time</text>
-  <text x="-150" y="40" text-anchor="middle" transform="rotate(-90)" font-size="12">Grasp</text>
+        stroke="currentColor" stroke-width="4" fill="none"/>
+  <text x="350" y="350" text-anchor="middle" font-size="12" fill="currentColor">Time</text>
+  <text x="-150" y="40" text-anchor="middle" transform="rotate(-90)" font-size="12" fill="currentColor">Grasp</text>
 </svg>
 
 <!--
+* Expect to tackle Kubernetes "from underneath",
+  with a lower-level approach than usual
 * Effort vs. grasp when learning a new subject
   * First, we struggle to grasp new information we encounter
     because we lack the vocabulary and mental models
@@ -83,15 +94,15 @@ level: 2
 
 <v-click>
 
-* Production-Grade Container Scheduling and Management
-  ([github](https://github.com/kubernetes/kubernetes))
-* Kubernetes,
-  also known as K8s,
-  is an open source system for automating deployment,
-  scaling,
-  and management
-  of containerized applications
-  ([docs](https://kubernetes.io/))
+* > Production-Grade Container Scheduling and Management
+  > — [github](https://github.com/kubernetes/kubernetes)
+* > Kubernetes,
+  > also known as K8s,
+  > is an open source system for automating deployment,
+  > scaling,
+  > and management
+  > of containerized applications
+  > — [docs](https://kubernetes.io/)
 </v-click>
 
 ---
@@ -101,10 +112,10 @@ level: 2
 
 # Introduction – What’s really Kubernetes?
 
-* > Kubernetes is a declarative API for building declarative APIs\
-  > Kubernetes is a platform for building platforms\
-  > Kubernetes is a datacenter OS\
-  > Kubernetes is the standardized, low level, Cloud API
+* > Kubernetes is a declarative API for building declarative APIs
+* > Kubernetes is a platform for building platforms
+* > Kubernetes is a datacenter OS
+* > Kubernetes is the standardized, low level, Cloud API
 * [kcp](https://www.kcp.io/):
   Kubernetes-like control planes for form-factors and use-cases
   beyond Kubernetes and container workloads.
@@ -113,57 +124,53 @@ level: 2
 ---
 title: Introduction – Covered Topics
 level: 2
+hide: true
 
 ---
 
-```mermaid
+```mermaid {scale: 0.68}
 block-beta
-  columns 8
+  columns 6
 
-  space:1
-  applications["<b>Applications</b></br><em></em>"]:6
-  space:1
+  applications["<b>Applications</b></br><em>Backends, IDPs,</br>infrastructure automation</em>"]:6
 
-  space:1
-  docker["<b>Docker</b></br><em>pull, build, run, exec</em>"]:2
+  space
   kind["<b>Kinds</b></br><em>Pod, Service, CRD</em>"]:2
   kubectl["<b>kubectl</b></br><em>get, apply, logs</em>"]:2
-  space:1
+  space
 
-  oci["<b>OCI Containers</b></br><em>& images</em>"]:2
-  concepts["<b>Concepts</b></br><em>controllers, API,</br>key-value store</em>"]:2
+  docker["<b>Docker</b></br><em>pull, build, run, exec</em>"]:2
   resources["<b>API Resources</b></br><em>/pods, /services</em>"]:2
   components["<b>Components</b></br><em>controller-manager,</br>scheduler, api-server</em>"]:2
 
-  space:1
+  oci["<b>OCI Containers</b></br><em>& images</em>"]:2
+  concepts["<b>Concepts</b></br><em>controllers, API,</br>key-value store</em>"]:2
+  architecture["<b>Architecture principles</b></br><em>loose coupling, control</br>loop, level-driven, APIs</em>"]:2
+
+  space
   linux["<b>Linux Features</b></br><em>cgroup, namespace</em>"]:2
-  architecture["<b>Architecture principles</b></br><em>loose coupling, control</br>loop, level-driven, APIs</em>"]:4
-  space:1
+  network["<b>Networking</b></br><em>VXLAN, VPN, TCP/IP, eBPF</br>encapsulation, routing</em>"]:2
+  space
 
-  space:3
-  void["…"]:2
-  space:3
+  void["…"]:6
 
-  isa["<b>ISA</b></br><em>mov, add, jmp, xor</em>"]:8
+  isa["<b>ISA</b></br><em>mov, add, jmp, xor</em>"]:6
+
+  hardware["<b>Hardware & Virtualization</b></br><em>Servers, Data Centers,</br>Routers, Switches</em>"]:6
 
   classDef void fill:none,stroke-width:0,font-size:40px
   class void void
-
-  classDef base height:120px
-  class applications,docker,kind,kubectl,oci,concepts,components,resources,linux,architecture,isa base
-
+  classDef base
+  class applications,docker,kind,kubectl,oci,concepts,components,resources,linux,network,architecture,isa,hardware base
   classDef covered stroke:#f00,stroke-width:4px
   class oci,concepts,components covered
-
-  classDef mentioned stroke:#f00,stroke-width:4px,stroke-dasharray: 12
+  classDef mentioned stroke:#f00,stroke-width:2px,stroke-dasharray: 5
   class kind,kubectl,resources,linux,architecture mentioned
 ```
 
 <!--
 * Concepts are built upon each other
 * We'll only cover/mention highlighed topics
-* We tackle Kubernetes from underneath,
-  with a lower-level approach than usual
 -->
 
 ---
@@ -172,6 +179,11 @@ layout: section
 ---
 
 # OCI Containers
+
+<!--
+* You can't talk about Kubernetes
+  without first talking about containers
+-->
 
 ---
 level: 2
@@ -189,10 +201,12 @@ level: 2
 * A catch-all term to mean OCI
 
 <!--
+* And you can't talk about containers
+  without first demystifying Docker
 * The _lightweight VM_ analogy helped with adoption by developers,
-but it quickly shows its limits
-when we need to precisely understand what's going on,
-e.g. to debug a distroless container
+  but it quickly shows its limits
+  when we need to precisely understand what's going on,
+  e.g. to debug a distroless container
 -->
 
 ---
@@ -219,17 +233,22 @@ Practically,
   with some Linux features sprinkled on top:
   `chroot`, namespaces, and cgroups
 
+<!--
+* These are simplified definitions,
+  with some shortcuts and little nuance
+-->
+
 ---
 layout: two-cols-header
-layoutClass: layout
+layoutClass: OkyjSYcr
 level: 2
+hide: true
 
 ---
 
-<style>
-.layout {
-  grid-template-columns: 1fr max-content !important;
-  grid-template-rows: max-content 1fr !important;
+<style scoped>
+.OkyjSYcr {
+  grid-template-columns: 1fr max-content;
 }
 </style>
 
@@ -273,18 +292,20 @@ flowchart LR
 ```
 
 <!--
+* **This slide is slightly off-topic,
+  feel free to skip it**
 * Docker "layers"
   * runc:
     manage container lifecycle (create, start, exec, kill, delete),
-    not a daemon
+    CLI (not a daemon)
   * containerd:
     pull, push, and store images,
     supervise containers,
     low-level network and volume management,
-    integration points (high-level APIs & plugins)
+    integration points (high-level APIs and plugins)
   * Docker:
     build images,
-    provide orchestration features (Compose & Swarm),
+    provide orchestration features (Compose and Swarm),
     high-level network and volume management,
     higher-level CLI and API
   * Desktop:
@@ -296,6 +317,7 @@ flowchart LR
 
 ---
 level: 2
+hide: true
 
 ---
 
@@ -311,3 +333,110 @@ level: 2
   and Thomas Pepiot’s ([1](https://octo.ubicast.tv/videos/under-the-hood-of-docker-containers-16-03-2017-152440-partie-1_73877/) and [2](https://octo.ubicast.tv/videos/under-the-hood-of-docker-containers-16-03-2017-152440-partie-2_73250/)) BoFs (private)
 * [Dockerless](https://www.youtube.com/watch?v=Li3iWRRHgX8&list=PLozcbFx8FoPH30kYPbPuPsvxASWoLo9XB) playlist
 * [Debunking Container Myths](https://iximiuz.com/en/series/debunking-container-myths/), and Ivan Velichko’s blog in general
+
+---
+layout: section
+
+---
+
+# Kubernetes
+
+---
+level: 2
+
+---
+
+# Kubernetes – History
+
+* Born at Google in 2014
+* Built at the crossroads of
+  * A decade of experience running containers at scale (Borg, Omega, cgroups, lmctfy)
+  * Docker gaining traction, popularizing container usage
+  * A strategic oportunity to catch up in the cloud race by leveraging OSS
+
+<!--
+* Reasonning at the application granularity,
+  instead of the individual servers
+  is self-evident for Googlers
+-->
+
+---
+layout: two-cols-header
+level: 2
+
+---
+
+# Kubernetes – Purpose
+
+::left::
+
+* Abstracts away the infrastructure
+* Enable _properly_ managing many containerized workloads
+
+::right::
+
+<div v-click style="overflow-y: auto; max-height: 47%">
+
+* Workload variety (stateful, Windows, ML, batches)
+* Configuration management (environment variables, configuration files, flags)
+* Service discovery
+* Network communication and isolation
+* Public exposition (routing, load balancing, rate limiting, TLS termination, DNS)
+* Security (least privilege, multi-tenancy, isolation)
+* Resource management (CPU/GPU cores, RAM/VRAM, storage, network, devices, …)
+* Health/readiness/startup checks
+* Telemetry collection and annotation
+* Progressive deployment/release and rollbacks
+* Vertical/horizontal (auto)scaling
+* Scheduling constraints and priority (spread, affinity, contention, overprovisioning, QoS, cronjobs)
+* Developpement and debug tooling
+* Graceful termination
+* Infrastructure/self lifecycle management
+* Extensibility
+* Consistent, high-quality APIs and configuration format
+* Authentication, authorization, audit
+* Certificate management
+* Backups and disaster recovery
+
+</div>
+
+<!--
+* Expose heterogeneous infrastructure through a unified API
+* Once we establish a standard
+  for distributing and running applications
+  in a portable and isolated manner (containers),
+  the appeal of a layer
+  for homogenization and orchestration becomes clear
+* The original purpose closely matches the "official" descriptions
+  * Container Scheduling and Management
+  * System for automating deployment, scaling, and management of containerized applications
+  * And also that "Datacenter OS" idea
+* To _properly_ manage workloads,
+  Kubernetes put lot of thought into…
+-->
+
+---
+level: 2
+
+---
+
+# Kubernetes – Purpose (updated)
+
+* These definitions held for a few years
+* Kubernetes has since evolved into a lower-level,
+  more general-purpose tool.
+  It often serves as a building block
+  to create higher-level platforms
+* To fully grasp this new use,
+  one needs to understand Kubernetes' design principles and components,
+  and how they can be applied and combined
+  to address a wide range of problems
+
+<!--
+* That's were these definitions come in
+  * Kubernetes is a declarative API for building declarative APIs
+  * Kubernetes is a platform for building platforms
+  * Kubernetes is the standardized, low level, Cloud API
+  * kcp: Kubernetes-like control planes for form-factors and use-cases
+    beyond Kubernetes and container workloads.
+-->
