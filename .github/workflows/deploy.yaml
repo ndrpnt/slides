@@ -20,8 +20,15 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Install dependencies
         run: npm ci
-      - name: Build with Slidev
-        run: npx slidev build --base /tlak --out ../_site/tlak tlak/slides.md
+      - name: Build slides
+        run: |
+          npx slidev build --base /tlak --out ../_site/tlak tlak/slides.md
+      - name: Setup home page and redirection
+        run: |
+          cat _site/*/_redirects > _site/_redirects && rm _site/*/_redirects
+          cat > _site/index.md << EOF
+          * [Thinking like a Kubernetes](./tlak)
+          EOF
       - name: Configure GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - name: Upload artifact

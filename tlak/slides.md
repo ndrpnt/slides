@@ -439,4 +439,25 @@ level: 2
   * Kubernetes is the standardized, low level, Cloud API
   * kcp: Kubernetes-like control planes for form-factors and use-cases
     beyond Kubernetes and container workloads.
+* Crossplane: like Terraform,
+  except with Kubernetes resources instead of HCL.
+-->
+
+---
+layout: section
+
+---
+
+# Components
+
+---
+level: 2
+
+---
+
+# Components – Boundaries and Responsibilities
+
+<!--
+* https://kubernetes.io/docs/concepts/overview/components/
+* https://kubernetes.io/docs/concepts/architecture/
 -->
