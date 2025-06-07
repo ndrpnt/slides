@@ -375,25 +375,33 @@ level: 2
 
 ::right::
 
-<div v-click style="overflow-y: auto; max-height: 47%">
+<div v-click class="overflow-y-auto max-h-47/100">
 
-* Workload variety (stateful, Windows, ML, batches)
-* Configuration management (environment variables, configuration files, flags)
+* Workload variety
+  (stateful, Windows, ML, batches, sidecars)
+* Configuration management
+  (environment variables, configuration files, flags, secrets)
 * Service discovery
 * Network communication and isolation
-* Public exposition (routing, load balancing, rate limiting, TLS termination, DNS)
-* Security (least privilege, multi-tenancy, isolation)
-* Resource management (CPU/GPU cores, RAM/VRAM, storage, network, devices, …)
-* Health/readiness/startup checks
+* Public exposition
+  (routing, load balancing, rate limiting, TLS termination, DNS)
+* Security
+  (least privilege, multi-tenancy, isolation)
+* Resource management
+  (CPU/GPU cores, RAM/VRAM, storage, network, devices, …)
+* Health and readiness management
 * Telemetry collection and annotation
-* Progressive deployment/release and rollbacks
-* Vertical/horizontal (auto)scaling
-* Scheduling constraints and priority (spread, affinity, contention, overprovisioning, QoS, cronjobs)
+* Progressive deployment and rollback
+* Vertical and horizontal (auto)scaling
+* Scheduling constraints and priority
+  (spread, affinity, contention, overprovisioning, QoS, cronjobs)
 * Developpement and debug tooling
-* Graceful termination
-* Infrastructure/self lifecycle management
+* Graceful startup and termination
+* Infrastructure and own lifecycle management
+  (installation, upgrades, observability, flexibility)
 * Extensibility
 * Consistent, high-quality APIs and configuration format
+* Debugging facilities
 * Authentication, authorization, audit
 * Certificate management
 * Backups and disaster recovery
@@ -431,6 +439,9 @@ level: 2
   one needs to understand Kubernetes' design principles and components,
   and how they can be applied and combined
   to address a wide range of problems
+* Example
+  * Crossplane: map Kubernetes resources external resources
+* Example Operator -> orchestration logic to handle deployment, upgrade, scaling, remediation, backups, …
 
 <!--
 * That's were these definitions come in
@@ -461,3 +472,87 @@ level: 2
 * https://kubernetes.io/docs/concepts/overview/components/
 * https://kubernetes.io/docs/concepts/architecture/
 -->
+
+---
+level: 2
+
+---
+
+# TODO
+
+<v-switch>
+  <template #1>
+
+```mermaid
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+```
+
+  </template>
+  <template #2>
+
+```mermaid
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+    rect rgba(0, 255, 0, .1)
+      api-->>etcd: save new state
+    end
+```
+
+  </template>
+  <template #3>
+
+```mermaid
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+    api-->>etcd: save new state
+    rect rgba(0, 255, 0, .1)
+      api->>scheduler: notify about unassigned pod
+      scheduler->>api: assign pod to node
+      api-->>etcd: save new state
+    end
+```
+
+  </template>
+  <template #4>
+
+```mermaid
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+    participant runtime as Container Runtime<br><br>(worker node)
+
+    user->>api: kubectl apply -f pod.yaml
+    api-->>etcd: save new state
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    api-->>etcd: save new state
+    rect rgba(0, 255, 0, .1)
+      api->>kubelet: notify about bound pod
+      kubelet->>runtime: start container
+      kubelet->>api: update pod status
+      api-->>etcd: save new state
+    end
+```
+
+  </template>
+</v-switch>
