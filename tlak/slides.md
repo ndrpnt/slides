@@ -439,11 +439,26 @@ level: 2
   one needs to understand Kubernetes' design principles and components,
   and how they can be applied and combined
   to address a wide range of problems
-* Example
-  * Crossplane: map Kubernetes resources external resources
-* Example Operator -> orchestration logic to handle deployment, upgrade, scaling, remediation, backups, …
+
+<v-click>
+
+Some examples include:
+
+* Operators: leverage Kubernetes concepts
+  to encode operational knowledge of complex, usually stateful, applications
+  (deployment, upgrade, scaling, remediation, backups, …)
+* OpenFaaS / Knative: serverless platforms
+* Kubeflow: ML plateform
+* Crossplane: map Kubernetes resources to external resources
+* Cluster API: manage Kubernetes clusters
+</v-click>
 
 <!--
+* Kubernetes' well-thought architecture attracted varied use cases,
+  naturally pushing workload-specific logic into plugins
+  while keeping the core generic.
+* As plugin ecosystem expands,
+  container orchestration becomes just one use case.
 * That's were these definitions come in
   * Kubernetes is a declarative API for building declarative APIs
   * Kubernetes is a platform for building platforms
@@ -452,6 +467,7 @@ level: 2
     beyond Kubernetes and container workloads.
 * Crossplane: like Terraform,
   except with Kubernetes resources instead of HCL.
+* An operator exist for most database technology.
 -->
 
 ---
@@ -483,7 +499,7 @@ level: 2
 <v-switch>
   <template #1>
 
-```mermaid
+```mermaid  {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -495,7 +511,7 @@ sequenceDiagram
   </template>
   <template #2>
 
-```mermaid
+```mermaid  {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -504,14 +520,15 @@ sequenceDiagram
 
     user->>api: kubectl apply -f pod.yaml
     rect rgba(0, 255, 0, .1)
-      api-->>etcd: save new state
+      api-->>api: authn, authz,<br>validate, etc.
+      api-->>etcd: persist
     end
 ```
 
   </template>
   <template #3>
 
-```mermaid
+```mermaid  {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -519,19 +536,50 @@ sequenceDiagram
     participant etcd as etcd<br><br>(control plane)
     participant scheduler as Scheduler<br><br>(control plane)
 
+    rect rgba(0, 255, 0, .1)
+      scheduler-->>api: "watch" unassigned pods
+    end
     user->>api: kubectl apply -f pod.yaml
-    api-->>etcd: save new state
     rect rgba(0, 255, 0, .1)
       api->>scheduler: notify about unassigned pod
       scheduler->>api: assign pod to node
-      api-->>etcd: save new state
+      api-->>api: authn, authz,<br>validate, etc.
+      api-->>etcd: persist
     end
 ```
 
   </template>
   <template #4>
 
-```mermaid
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+    participant runtime as Container Runtime<br><br>(worker node)
+
+    rect rgba(0, 255, 0, .1)
+      kubelet-->>api: "watch" pods bound to itself
+    end
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    rect rgba(0, 255, 0, .1)
+      api->>kubelet: notify about bound pod
+      kubelet->>runtime: start container
+      kubelet->>api: update pod status
+      api-->>api: authn, authz,<br>validate, etc.
+      api-->>etcd: persist
+    end
+```
+
+  </template>
+  <template #5>
+
+```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -542,16 +590,11 @@ sequenceDiagram
     participant runtime as Container Runtime<br><br>(worker node)
 
     user->>api: kubectl apply -f pod.yaml
-    api-->>etcd: save new state
     api->>scheduler: notify about unassigned pod
     scheduler->>api: assign pod to node
-    api-->>etcd: save new state
-    rect rgba(0, 255, 0, .1)
-      api->>kubelet: notify about bound pod
-      kubelet->>runtime: start container
-      kubelet->>api: update pod status
-      api-->>etcd: save new state
-    end
+    api->>kubelet: notify about bound pod
+    kubelet->>runtime: start container
+    kubelet->>api: update pod status
 ```
 
   </template>
