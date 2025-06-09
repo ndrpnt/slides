@@ -521,12 +521,25 @@ sequenceDiagram
     user->>api: kubectl apply -f pod.yaml
     rect rgba(0, 255, 0, .1)
       api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: persist
+      api-->>etcd: write
     end
 ```
 
   </template>
   <template #3>
+
+```mermaid  {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+```
+
+  </template>
+  <template #4>
 
 ```mermaid  {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
@@ -542,14 +555,103 @@ sequenceDiagram
     user->>api: kubectl apply -f pod.yaml
     rect rgba(0, 255, 0, .1)
       api->>scheduler: notify about unassigned pod
-      scheduler->>api: assign pod to node
-      api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: persist
     end
 ```
 
   </template>
-  <template #4>
+  <template #5>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+```
+
+  </template>
+  <template #6>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    rect rgba(0, 255, 0, .1)
+      scheduler->>api: assign pod to node
+      api-->>api: authn, authz,<br>validate, etc.
+      api-->>etcd: write
+    end
+```
+
+  </template>
+  <template #7>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+```
+
+  </template>
+  <template #8>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+
+    rect rgba(0, 255, 0, .1)
+      kubelet-->>api: "watch" pods bound to itself
+    end
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    rect rgba(0, 255, 0, .1)
+      api->>kubelet: notify about bound pod
+    end
+```
+
+  </template>
+  <template #9>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    api->>kubelet: notify about bound pod
+```
+
+  </template>
+  <template #10>
 
 ```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
@@ -561,23 +663,20 @@ sequenceDiagram
     participant kubelet as Kubelet<br><br>(worker node)
     participant runtime as Container Runtime<br><br>(worker node)
 
-    rect rgba(0, 255, 0, .1)
-      kubelet-->>api: "watch" pods bound to itself
-    end
     user->>api: kubectl apply -f pod.yaml
     api->>scheduler: notify about unassigned pod
     scheduler->>api: assign pod to node
+    api->>kubelet: notify about bound pod
     rect rgba(0, 255, 0, .1)
-      api->>kubelet: notify about bound pod
       kubelet->>runtime: start container
       kubelet->>api: update pod status
       api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: persist
+      api-->>etcd: write
     end
 ```
 
   </template>
-  <template #5>
+  <template #11>
 
 ```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
