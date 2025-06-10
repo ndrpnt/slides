@@ -499,7 +499,7 @@ level: 2
 <v-switch>
   <template #1>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -511,7 +511,7 @@ sequenceDiagram
   </template>
   <template #2>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
@@ -530,7 +530,7 @@ sequenceDiagram
   </template>
   <template #3>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -543,7 +543,7 @@ sequenceDiagram
   </template>
   <template #4>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.66}
 %%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
@@ -761,7 +761,7 @@ level: 2
 <v-switch>
   <template #1>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.72}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -773,7 +773,7 @@ sequenceDiagram
   </template>
   <template #2>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.72}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -789,7 +789,7 @@ sequenceDiagram
   </template>
   <template #3>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.72}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
@@ -807,7 +807,7 @@ sequenceDiagram
   </template>
   <template #4>
 
-```mermaid  {scale: 0.66}
+```mermaid {scale: 0.72}
 %%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
 sequenceDiagram
     actor user
