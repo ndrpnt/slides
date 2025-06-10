@@ -43,13 +43,13 @@ func (m *Slides) Build(
 			return nil, fmt.Errorf("failed to read _redirects: %w", err)
 		}
 		redirects += content
-		index += "* [Thinking like a Kubernetes](./" + path + ")\n"
+		index += "        <li><a href=\"./" + path + "\">Thinking like a Kubernetes</a></li>\n"
 		site = site.WithDirectory(path, deck.WithoutFile("_redirects"))
 	}
 
 	site = site.
 		WithNewFile("_redirects", redirects).
-		WithNewFile("index.md", index)
+		WithNewFile("index.html", "<!DOCTYPE html>\n<html>\n<head>\n    <title>Presentations</title>\n</head>\n<body>\n    <h1>Presentations</h1>\n    <ul>\n"+index+"    </ul>\n</body>\n</html>")
 
 	return site, nil
 }
