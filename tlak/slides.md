@@ -512,16 +512,18 @@ sequenceDiagram
   <template #2>
 
 ```mermaid  {scale: 0.66}
-%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+%%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
     participant api as API Server<br><br>(control plane)
     participant etcd as etcd<br><br>(control plane)
 
-    user->>api: kubectl apply -f pod.yaml
+    user->>+api: kubectl apply -f pod.yaml
     rect rgba(0, 255, 0, .1)
-      api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: write
+      api-->>api: authn, authz, validate, …
+      api-->>+etcd: write
+      etcd-->>-api: ok
+      api-->>-user: ok
     end
 ```
 
@@ -542,7 +544,7 @@ sequenceDiagram
   <template #4>
 
 ```mermaid  {scale: 0.66}
-%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+%%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
     participant api as API Server<br><br>(control plane)
@@ -577,7 +579,7 @@ sequenceDiagram
   <template #6>
 
 ```mermaid {scale: 0.66}
-%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+%%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
     participant api as API Server<br><br>(control plane)
@@ -585,12 +587,15 @@ sequenceDiagram
     participant scheduler as Scheduler<br><br>(control plane)
 
     user->>api: kubectl apply -f pod.yaml
-    api->>scheduler: notify about unassigned pod
+    api->>+scheduler: notify about unassigned pod
     rect rgba(0, 255, 0, .1)
-      scheduler->>api: assign pod to node
-      api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: write
+      scheduler->>+api: assign pod to node
+      api-->>api: authn, authz, validate, …
+      api-->>+etcd: write
+      etcd-->>-api: ok
+      api-->>-scheduler: ok
     end
+    deactivate scheduler
 ```
 
   </template>
@@ -613,7 +618,7 @@ sequenceDiagram
   <template #8>
 
 ```mermaid {scale: 0.66}
-%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+%%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
     participant api as API Server<br><br>(control plane)
@@ -654,7 +659,7 @@ sequenceDiagram
   <template #10>
 
 ```mermaid {scale: 0.66}
-%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+%%{init:{"mirrorActors": false}}%%
 sequenceDiagram
     actor user
     participant api as API Server<br><br>(control plane)
@@ -666,13 +671,12 @@ sequenceDiagram
     user->>api: kubectl apply -f pod.yaml
     api->>scheduler: notify about unassigned pod
     scheduler->>api: assign pod to node
-    api->>kubelet: notify about bound pod
+    api->>+kubelet: notify about bound pod
     rect rgba(0, 255, 0, .1)
-      kubelet->>runtime: start container
-      kubelet->>api: update pod status
-      api-->>api: authn, authz,<br>validate, etc.
-      api-->>etcd: write
+      kubelet->>+runtime: start container
+      runtime-->>-kubelet: ok
     end
+    deactivate kubelet
 ```
 
   </template>
@@ -693,7 +697,129 @@ sequenceDiagram
     scheduler->>api: assign pod to node
     api->>kubelet: notify about bound pod
     kubelet->>runtime: start container
+```
+
+  </template>
+  <template #12>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+    participant runtime as Container Runtime<br><br>(worker node)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    api->>+kubelet: notify about bound pod
+    kubelet->>runtime: start container
+    rect rgba(0, 255, 0, .1)
+      kubelet->>+api: update pod status
+      api-->>api: authn, authz, validate, …
+      api-->>+etcd: write
+      etcd-->>-api: ok
+      api-->>-kubelet: ok
+    end
+    deactivate kubelet
+```
+
+  </template>
+  <template #13>
+
+```mermaid {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server<br><br>(control plane)
+    participant etcd as etcd<br><br>(control plane)
+    participant scheduler as Scheduler<br><br>(control plane)
+    participant kubelet as Kubelet<br><br>(worker node)
+    participant runtime as Container Runtime<br><br>(worker node)
+
+    user->>api: kubectl apply -f pod.yaml
+    api->>scheduler: notify about unassigned pod
+    scheduler->>api: assign pod to node
+    api->>kubelet: notify about bound pod
+    kubelet->>runtime: start container
     kubelet->>api: update pod status
+```
+
+  </template>
+</v-switch>
+
+---
+level: 2
+
+---
+
+# TODO 2
+
+<v-switch>
+  <template #1>
+
+```mermaid  {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server
+
+    user->>api: kubectl apply -f deployment.yaml
+```
+
+  </template>
+  <template #2>
+
+```mermaid  {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server
+    participant dep as Deployment controller
+
+    user->>api: kubectl apply -f deployment.yaml
+    rect rgba(0, 255, 0, .1)
+      dep->>api: create corresponding ReplicaSet
+    end
+```
+
+  </template>
+  <template #3>
+
+```mermaid  {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server
+    participant dep as Deployment controller
+    participant rs as ReplicaSet controller
+
+    user->>api: kubectl apply -f deployment.yaml
+    dep->>api: create corresponding ReplicaSet
+    rect rgba(0, 255, 0, .1)
+      rs->>api: create corresponding Pods
+    end
+```
+
+  </template>
+  <template #4>
+
+```mermaid  {scale: 0.66}
+%%{init:{"mirrorActors": false, "showSequenceNumbers": true}}%%
+sequenceDiagram
+    actor user
+    participant api as API Server
+    box Controller Manager
+      participant dep as Deployment controller
+      participant rs as ReplicaSet controller
+    end
+
+    user->>api: kubectl apply -f deployment.yaml
+    dep->>api: create corresponding ReplicaSet
+    rs->>api: create corresponding Pods
 ```
 
   </template>
