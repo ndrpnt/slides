@@ -1,11 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 
 	"dagger/slides/internal/dagger"
 )
+
+type Presentation struct {
+	Path  string
+	Title string
+}
+
+var presentations = []Presentation{
+	{Path: "tlak", Title: "Thinking like a Kubernetes"},
+}
 
 type Slides struct{}
 
@@ -28,28 +39,50 @@ func (m *Slides) Build(
 		WithMountedCache("/root/.npm", dag.CacheVolume("npm")).
 		WithExec([]string{"npm", "ci"})
 
-	var redirects string
-	var index string
-	site := dag.Directory()
-
-	for _, path := range []string{"tlak"} {
-		deck := container.
-			WithDirectory("/src/deck", source.Directory(path)).
-			WithWorkdir("/src/deck").
-			WithExec([]string{"npx", "@slidev/cli", "build", "--base", "/" + path}).
-			Directory("dist")
-		content, err := deck.File("_redirects").Contents(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("failed to read _redirects: %w", err)
-		}
-		redirects += content
-		index += "        <li><a href=\"./" + path + "\">Thinking like a Kubernetes</a></li>\n"
-		site = site.WithDirectory(path, deck.WithoutFile("_redirects"))
+	index, err := generateIndex(presentations)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate index.html: %w", err)
 	}
 
-	site = site.
-		WithNewFile("_redirects", redirects).
-		WithNewFile("index.html", "<!DOCTYPE html>\n<html>\n<head>\n    <title>Presentations</title>\n</head>\n<body>\n    <h1>Presentations</h1>\n    <ul>\n"+index+"    </ul>\n</body>\n</html>")
+	site := dag.Directory()
+	for _, presentation := range presentations {
+		deck := container.
+			WithDirectory("/src/deck", source.Directory(presentation.Path)).
+			WithWorkdir("/src/deck").
+			WithExec([]string{"npx", "@slidev/cli", "build", "--base", "/" + presentation.Path}).
+			Directory("dist").
+			WithoutFile("_redirects") // Not supported by GitHub Pages
+		site = site.WithDirectory(presentation.Path, deck)
+	}
 
-	return site, nil
+	return site.WithNewFile("index.html", index), nil
+}
+
+func generateIndex(presentations []Presentation) (string, error) {
+	const indexTemplate = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Presentations</title>
+</head>
+<body>
+    <h1>Presentations</h1>
+    <ul>
+{{- range .}}
+        <li><a href="./{{.Path}}">{{.Title}}</a></li>
+{{- end}}
+    </ul>
+</body>
+</html>`
+
+	tmpl, err := template.New("index").Parse(indexTemplate)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse template: %w", err)
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, presentations); err != nil {
+		return "", fmt.Errorf("failed to execute template: %w", err)
+	}
+
+	return buf.String(), nil
 }
