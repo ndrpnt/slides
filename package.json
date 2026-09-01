@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@slidev/cli": "^52.18.0",
+    "@slidev/cli": "^52.19.1",
     "@slidev/theme-default": "latest",
     "vue": "^3.5.40"
   }
